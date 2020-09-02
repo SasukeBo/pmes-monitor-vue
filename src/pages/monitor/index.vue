@@ -22,7 +22,7 @@
         @click.prevent="$router.push({ name: 'Device' })"
       >
         <a href="/monitor/devices">
-          <img src="./images/pi-shouye@2x.png" class="icon" />
+          <img src="./images/pi-device@2x.png" class="icon" />
           设备</a
         >
       </div>
@@ -33,6 +33,8 @@
 <style lang="scss">
 .device-monitor {
   text-align: center;
+  background: #080b10;
+  padding-bottom: 200px;
 
   .page-link {
     display: flex;

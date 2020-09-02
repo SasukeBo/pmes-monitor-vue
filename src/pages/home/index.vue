@@ -57,7 +57,6 @@
   .home-body {
     max-width: 1200px;
     margin: auto;
-    margin-bottom: 200px;
 
     .overview-list {
       margin-top: 100px;
@@ -65,7 +64,7 @@
 
       .overview-list__footer {
         height: 60px;
-        background: url('./images/3kuangxiabu@2x.png');
+        background: url('~@/assets/images/3kuangxiabu@2x.png');
         background-size: cover;
         color: #3ce4ed;
         line-height: 60px;
@@ -84,7 +83,7 @@
 
       .overview-list__header {
         height: 92px;
-        background: url('./images/1kaungshangbu@2x.png');
+        background: url('~@/assets/images/1kaungshangbu@2x.png');
         background-size: cover;
       }
 
