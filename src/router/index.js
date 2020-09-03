@@ -12,6 +12,7 @@ import Admin from '@/pages/admin'
 import AdminDevice from '@/pages/admin/device-manage/index.vue'
 import AdminDeviceManage from '@/pages/admin/device-manage/lists.vue'
 import AdminDeviceTypeManage from '@/pages/admin/device-manage/types.vue'
+import AdminDeviceTypeErrorCode from '@/pages/admin/device-manage/error-codes.vue'
 
 Vue.use(VueRouter)
 
@@ -37,6 +38,20 @@ const routes = [
             path: 'lists',
             name: 'AdminDeviceManage',
             component: AdminDeviceManage
+          },
+          {
+            // 对一个机种的故障代码配置
+            path: 'types/:id/error-codes',
+            name: 'AdminDeviceTypeErrorCode',
+            props: true,
+            component: AdminDeviceTypeErrorCode
+          },
+          {
+            // 对单个设备的故障代码配置
+            path: ':id/error-codes',
+            name: 'AdminDeviceErrorCode',
+            props: true,
+            component: AdminDeviceTypeErrorCode
           }
         ]
       }

@@ -93,6 +93,7 @@
 
   .nav-tabs {
     width: 160px;
+    min-width: 160px;
     background: #1e2630;
     color: #e0e1e3;
 

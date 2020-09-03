@@ -96,6 +96,9 @@ export default {
   methods: {
     cancel() {},
     save() {},
+    manageCode(id) {
+      this.$router.push({ name: 'AdminDeviceTypeErrorCode', params: { id } })
+    },
     handleSizeChange() {},
     handleCurrentChange() {}
   }
