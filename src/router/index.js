@@ -9,7 +9,9 @@ import DeviceOverview from '@/pages/device/overview.vue'
 import DeviceAnalyze from '@/pages/device/analyze'
 import DeviceErrorlog from '@/pages/device/errorlogs.vue'
 import Admin from '@/pages/admin'
-import AdminDevice from '@/pages/admin/devices.vue'
+import AdminDevice from '@/pages/admin/device-manage/index.vue'
+import AdminDeviceManage from '@/pages/admin/device-manage/lists.vue'
+import AdminDeviceTypeManage from '@/pages/admin/device-manage/types.vue'
 
 Vue.use(VueRouter)
 
@@ -23,7 +25,20 @@ const routes = [
       {
         path: 'devices',
         name: 'AdminDevice',
-        component: AdminDevice
+        component: AdminDevice,
+        redirect: { name: 'AdminDeviceTypeManage' },
+        children: [
+          {
+            path: 'types',
+            name: 'AdminDeviceTypeManage',
+            component: AdminDeviceTypeManage
+          },
+          {
+            path: 'lists',
+            name: 'AdminDeviceManage',
+            component: AdminDeviceManage
+          }
+        ]
       }
     ]
   },
