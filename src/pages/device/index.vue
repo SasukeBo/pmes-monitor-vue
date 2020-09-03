@@ -98,6 +98,9 @@ export default {
     }
   },
   methods: {
+    viewDevice(id) {
+      this.$router.push({ name: 'DeviceOverview', params: { id } })
+    },
     handleSizeChange(val) {
       console.log(val)
     },

@@ -18,6 +18,16 @@
       </div>
 
       <div
+        :class="['page-link__btn', $route.name === 'Dashboard' ? 'active' : '']"
+        @click.prevent="$router.push({ name: 'Dashboard' })"
+      >
+        <a href="/monitor/dashboards">
+          <img src="./images/pi-device@2x.png" class="icon" />
+          看板</a
+        >
+      </div>
+
+      <div
         :class="['page-link__btn', $route.name === 'Device' ? 'active' : '']"
         @click.prevent="$router.push({ name: 'Device' })"
       >
@@ -38,7 +48,7 @@
 
   .page-link {
     display: flex;
-    max-width: 600px;
+    max-width: 800px;
     margin: auto;
     position: relative;
     top: -14px;
@@ -52,6 +62,7 @@
       background: url('./images/changtai-weidianji@2x.png');
       background-size: cover;
       cursor: pointer;
+      transition: all 0.3s ease;
 
       a {
         color: #a0a3a8;
@@ -62,19 +73,20 @@
         display: none;
       }
 
-      &.active {
+      &.active .icon {
+        width: 22px;
+        display: inline-block;
+        position: relative;
+        top: 4px;
+      }
+
+      &.active,
+      &:hover {
         background: url('./images/xuanzhong-weidianji@2x.png');
         background-size: cover;
 
         a {
           color: #3be3ed;
-        }
-
-        .icon {
-          width: 22px;
-          display: inline-block;
-          position: relative;
-          top: 4px;
         }
       }
     }
