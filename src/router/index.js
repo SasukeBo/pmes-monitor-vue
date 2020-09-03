@@ -8,10 +8,25 @@ import DeviceView from '@/pages/device/view.vue'
 import DeviceOverview from '@/pages/device/overview.vue'
 import DeviceAnalyze from '@/pages/device/analyze'
 import DeviceErrorlog from '@/pages/device/errorlogs.vue'
+import Admin from '@/pages/admin'
+import AdminDevice from '@/pages/admin/devices.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
+  {
+    path: '/monitor/admin',
+    name: 'Admin',
+    redirect: { name: 'AdminDevice' },
+    component: Admin,
+    children: [
+      {
+        path: 'devices',
+        name: 'AdminDevice',
+        component: AdminDevice
+      }
+    ]
+  },
   {
     path: '/monitor',
     name: 'Monitor',

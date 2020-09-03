@@ -5,8 +5,14 @@
 </template>
 <style lang="scss">
 html,
-body {
+body,
+#app {
+  height: 100%;
   margin: 0;
+}
+
+#app {
+  overflow: auto;
 }
 
 * {
