@@ -5,11 +5,17 @@
         普创智控
       </div>
 
-      <div class="nav-tab">
+      <div
+        :class="['nav-tab', isActive('AdminDevice') ? 'active' : '']"
+        @click="$router.push({ name: 'AdminDevice' })"
+      >
         设备管理
       </div>
 
-      <div class="nav-tab">
+      <div
+        :class="['nav-tab', isActive('AdminDashboard') ? 'active' : '']"
+        @click="$router.push({ name: 'AdminDashboard' })"
+      >
         看板管理
       </div>
     </div>
@@ -43,6 +49,17 @@
     </div>
   </div>
 </template>
+<script>
+export default {
+  name: 'MonitorAdmin',
+  methods: {
+    isActive(name) {
+      var activeIndex = this.$route.matched.findIndex((m) => m.name === name)
+      return activeIndex > -1
+    }
+  }
+}
+</script>
 <style lang="scss">
 .admin {
   height: 100%;
@@ -67,6 +84,7 @@
       height: 64px;
       position: absolute;
       width: 100%;
+      border-bottom: 1px solid #dedede;
 
       .header-btn {
         width: 125px;

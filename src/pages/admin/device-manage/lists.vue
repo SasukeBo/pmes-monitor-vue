@@ -63,6 +63,7 @@ export default {
   name: 'AdminDeviceManage',
   data() {
     return {
+      search: '',
       currentPage: 1,
       tableData: []
     }

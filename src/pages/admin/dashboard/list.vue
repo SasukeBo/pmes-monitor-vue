@@ -1,9 +1,9 @@
 <template>
-  <div class="admin-device-types">
+  <div class="admin-dashboard-list">
     <div class="operation">
       <el-input
         size="small"
-        placeholder="搜索机种"
+        placeholder="搜索看板"
         v-model="search"
         class="admin-input search"
       >
@@ -13,42 +13,29 @@
         size="small"
         type="primary"
         class="add-btn"
-        @click="dialogFormVisible = true"
-        >新增机种</el-button
+        @click="$router.push({ name: 'AdminDashboardCreate' })"
+        >新增看板</el-button
       >
       <el-button size="small" type="danger">批量删除</el-button>
     </div>
-
-    <el-dialog title="创建机种" :visible.sync="dialogFormVisible" width="500px">
-      <el-form :model="form">
-        <el-form-item label="填写名称" label-width="80">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancel()">取 消</el-button>
-        <el-button type="primary" @click="save()">确 定</el-button>
-      </div>
-    </el-dialog>
 
     <div class="type-list">
       <el-table class="admin-table" stripe :data="tableData">
         <el-table-column type="selection"></el-table-column>
         <el-table-column type="index" label="序号"></el-table-column>
-        <el-table-column prop="name" label="机种名称"></el-table-column>
+        <el-table-column prop="name" label="看板名称"></el-table-column>
+        <el-table-column prop="count" label="设备数量"></el-table-column>
         <el-table-column prop="user" label="创建人"></el-table-column>
         <el-table-column prop="createdAt" label="创建时间"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
               type="text"
-              @click="deleteType(scope.row.id)"
+              @click="deleteDashboard(scope.row.id)"
               style="color: #fb6f70"
               >删除</el-button
             >
-            <el-button type="text" @click="manageCode(scope.row.id)"
-              >故障代码</el-button
-            >
+            <el-button type="text" @click="edit(scope.row.id)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -69,44 +56,40 @@
 </template>
 <script>
 export default {
-  name: 'AdminDeviceTypeManage',
+  name: 'AdminDashboardList',
   data() {
     return {
       search: '',
-      currentPage: 1,
-      dialogFormVisible: false,
-      form: {
-        name: ''
-      },
       tableData: [
         {
           id: 1,
-          name: '1609检测设备',
-          user: '小明',
-          createdAt: '2020-01-01'
-        },
-        {
-          id: 2,
-          name: '1609检测设备',
-          user: '小明',
-          createdAt: '2020-01-01'
+          count: 5,
+          name: '测试看板',
+          user: '小白',
+          createdAt: '2020-09-05'
         }
-      ]
+      ],
+      currentPage: 1
     }
   },
   methods: {
-    cancel() {},
-    save() {},
-    manageCode(id) {
-      this.$router.push({ name: 'AdminDeviceTypeErrorCode', params: { id } })
+    edit(id) {
+      this.$router.push({ name: 'AdminDashboardEdit', params: { id } })
     },
-    handleSizeChange() {},
-    handleCurrentChange() {}
+    deleteDashboard(id) {
+      console.log(id)
+    },
+    handleSizeChange(val) {
+      console.log(val)
+    },
+    handleCurrentChange(val) {
+      console.log(val)
+    }
   }
 }
 </script>
 <style lang="scss">
-.admin-device-types {
+.admin-dashboard-list {
   padding: 24px;
 
   .operation {
