@@ -28,7 +28,7 @@
 </template>
 <style lang="scss">
 .admin-devices {
-  height: 100%;
+  height: calc(100% - 64px);
   overflow: hidden;
   position: relative;
 

@@ -13,6 +13,7 @@ import AdminDevice from '@/pages/admin/device-manage/index.vue'
 import AdminDeviceManage from '@/pages/admin/device-manage/lists.vue'
 import AdminDeviceTypeManage from '@/pages/admin/device-manage/types.vue'
 import AdminDeviceTypeErrorCode from '@/pages/admin/device-manage/error-codes.vue'
+import AdminDeviceCreate from '@/pages/admin/device-manage/create.vue'
 
 Vue.use(VueRouter)
 
@@ -52,6 +53,11 @@ const routes = [
             name: 'AdminDeviceErrorCode',
             props: true,
             component: AdminDeviceTypeErrorCode
+          },
+          {
+            path: 'create',
+            name: 'AdminDeviceCreate',
+            component: AdminDeviceCreate
           }
         ]
       }
