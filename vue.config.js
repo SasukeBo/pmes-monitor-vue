@@ -1,3 +1,4 @@
 module.exports = {
-  publicPath: '/monitor'
+  publicPath: '/monitor',
+  baseUrl: '/monitor'
 }
