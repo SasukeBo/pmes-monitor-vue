@@ -1,6 +1,6 @@
 <template>
   <div class="admin-device-create-form">
-    <el-form :model="form" :rules="rules" inline>
+    <el-form :model="form" :rules="rules" inline ref="form">
       <el-form-item label="设备编号" prop="number" style="margin-left: 0">
         <el-input v-model="form.number"></el-input>
       </el-form-item>
@@ -26,7 +26,10 @@ export default {
         address: ''
       },
       rules: {
-        number: [{ required: true, message: '请输入设备编号', trigger: 'blur' }]
+        number: [
+          { required: true, message: '请输入设备编号', trigger: 'blur' }
+        ],
+        mac: [{ required: true, message: '请输入设备Mac地址', trigger: 'blur' }]
       }
     }
   }

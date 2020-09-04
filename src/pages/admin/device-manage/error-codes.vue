@@ -44,7 +44,13 @@
         <el-button type="info" size="small" @click="$router.go(-1)"
           >返回</el-button
         >
-        <el-button type="primary" size="small">保存</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          @click="submit()"
+          :loading="loading"
+          >保存</el-button
+        >
       </div>
     </div>
 
@@ -66,59 +72,42 @@
   </div>
 </template>
 <script>
+import gql from 'graphql-tag'
+
 export default {
   name: 'AdminDeviceTypeErrorCode',
+  props: {
+    id: [Number, String]
+  },
   data() {
     return {
       dialogFormVisible: false,
       editContent: '',
       currentIndex: undefined,
-      tableData: [
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '停机原因停机原因停机原因停机原因停机原因停机原因停停机原...',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        ''
-      ]
+      deviceType: undefined,
+      tableData: [],
+      loading: false
+    }
+  },
+  apollo: {
+    deviceType: {
+      query: gql`
+        query($id: Int!) {
+          deviceType: adminDeviceType(id: $id) {
+            id
+            name
+            errorCode {
+              id
+              errors
+            }
+          }
+        }
+      `,
+      variables() {
+        return {
+          id: this.id
+        }
+      }
     }
   },
   computed: {
@@ -126,7 +115,63 @@ export default {
       return Math.floor(this.tableData.length / 16) + 1
     }
   },
+  watch: {
+    deviceType(val) {
+      if (val) {
+        if (val.errorCode && val.errorCode.errors) {
+          this.tableData = val.errorCode.errors
+        }
+      }
+    }
+  },
   methods: {
+    submit() {
+      if (this.deviceType.errorCode && this.deviceType.errorCode.id) {
+        this.loading = true
+        this.$apollo
+          .mutate({
+            mutation: gql`
+              mutation($id: Int!, $errors: [String!]!) {
+                adminSaveErrorCode(id: $id, errors: $errors)
+              }
+            `,
+            variables: {
+              id: this.deviceType.errorCode.id,
+              errors: this.tableData
+            }
+          })
+          .then(() => {
+            this.$message({ type: 'success', message: '保存成功' })
+            this.loading = false
+          })
+          .catch((e) => {
+            this.loading = false
+            this.$GraphQLError(e)
+          })
+      } else {
+        this.loading = true
+        this.$apollo
+          .mutate({
+            mutation: gql`
+              mutation($id: Int!, $errors: [String!]!) {
+                adminDeviceTypeAddErrorCode(deviceTypeID: $id, errors: $errors)
+              }
+            `,
+            variables: {
+              id: this.id,
+              errors: this.tableData
+            }
+          })
+          .then(() => {
+            this.$message({ type: 'success', message: '保存成功' })
+            this.loading = false
+          })
+          .catch((e) => {
+            this.loading = false
+            this.$GraphQLError(e)
+          })
+      }
+    },
     addRow() {
       for (var i = 0; i < 16; i++) {
         this.tableData.push('')
