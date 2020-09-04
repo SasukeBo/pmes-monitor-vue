@@ -1,7 +1,7 @@
 <template>
   <div class="admin">
     <div class="nav-tabs">
-      <div class="nav-tabs-title">
+      <div class="nav-tabs-title" @click="$router.push({ name: 'Monitor' })">
         普创智控
       </div>
 
@@ -21,7 +21,7 @@
     </div>
     <div class="admin-main">
       <div class="admin-main-header">
-        <div class="header-btn">
+        <div class="header-btn" @click="$router.push({ name: 'Monitor' })">
           <svg
             t="1599112613219"
             class="icon"
@@ -117,6 +117,7 @@ export default {
 
     .nav-tabs-title {
       height: 64px;
+      cursor: pointer;
       line-height: 64px;
       padding-left: 16px;
       font-size: 24px;

@@ -3,6 +3,7 @@
     <div class="form-title">添加看板</div>
     <el-form
       :model="form"
+      ref="form"
       label-width="150px"
       style="width: 600px"
       :rules="rules"
@@ -25,7 +26,7 @@
           <el-option v-for="item in options" :key="item.id" :value="item.id">
             <span style="float: left">{{ item.number }}</span>
             <span style="float: right; color: #8492a6; font-size: 13px">{{
-              item.type.name
+              item.deviceType.name
             }}</span>
           </el-option>
         </el-select>
@@ -41,7 +42,7 @@
       >
         <span>{{ item.number }}</span>
         <span style="color: #8492a6; font-size: 13px; margin-left: auto">{{
-          item.type.name
+          item.deviceType.name
         }}</span>
         <span style="margin: 0 16px"><i class="el-icon-error"></i></span>
       </div>
@@ -51,11 +52,18 @@
       <el-button type="info" size="small" @click="$router.go(-1)"
         >取消</el-button
       >
-      <el-button type="primary" size="small">保存</el-button>
+      <el-button
+        type="primary"
+        size="small"
+        @click="submit"
+        :loading="submitting"
+        >保存</el-button
+      >
     </div>
   </div>
 </template>
 <script>
+import gql from 'graphql-tag'
 export default {
   name: 'AdminDashboardCreateForm',
   props: {
@@ -64,6 +72,7 @@ export default {
   data() {
     return {
       selectDeviceID: undefined,
+      submitting: false,
       loading: false,
       rules: {
         name: [{ required: true, message: '请填写看板名称', trigger: 'blur' }]
@@ -78,12 +87,37 @@ export default {
   },
   methods: {
     remoteMethod(val) {
-      this.options = []
-      this.options.push({
-        id: val,
-        number: 'AJS-9081H-' + val,
-        type: { id: 1, name: '1069' }
-      })
+      this.loading = true
+      this.$apollo
+        .query({
+          query: gql`
+            query($search: String) {
+              response: adminDevices(search: $search, page: 1, limit: 20) {
+                devices {
+                  id
+                  number
+                  deviceType {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            search: val
+          }
+        })
+        .then(({ data: { response } }) => {
+          this.loading = false
+          if (response.devices) {
+            this.options = response.devices
+          }
+        })
+        .catch((e) => {
+          this.loading = false
+          this.$GraphQLError(e)
+        })
     },
     handleSelectChange(val) {
       var index = this.form.deviceIDs.find((i) => i === val)
@@ -108,6 +142,33 @@ export default {
       if (index >= 0) {
         this.form.deviceIDs.splice(index, 1)
       }
+    },
+    submit() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.submitting = true
+          this.$apollo
+            .mutate({
+              mutation: gql`
+                mutation($name: String!, $deviceIDs: [Int!]!) {
+                  adminCreateDashboard(name: $name, deviceIDs: $deviceIDs)
+                }
+              `,
+              variables: {
+                ...this.form
+              }
+            })
+            .then(() => {
+              this.submitting = false
+              this.$message({ type: 'success', message: '提交成功' })
+              this.$router.push({ name: 'AdminDashboardList' })
+            })
+            .catch((e) => {
+              this.submitting = false
+              this.$GraphQLError(e)
+            })
+        }
+      })
     }
   }
 }

@@ -20,11 +20,15 @@
     </div>
 
     <div class="type-list">
-      <el-table class="admin-table" stripe :data="tableData">
+      <el-table class="admin-table" stripe :data="tableData.dashboards">
         <el-table-column type="selection"></el-table-column>
         <el-table-column type="index" label="序号"></el-table-column>
         <el-table-column prop="name" label="看板名称"></el-table-column>
-        <el-table-column prop="count" label="设备数量"></el-table-column>
+        <el-table-column label="设备数量">
+          <template slot-scope="scope">
+            {{ (scope.row.devices || []).length }}
+          </template>
+        </el-table-column>
         <el-table-column prop="user" label="创建人"></el-table-column>
         <el-table-column prop="createdAt" label="创建时间"></el-table-column>
         <el-table-column label="操作">
@@ -45,31 +49,59 @@
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage"
+      :current-page="page"
       :page-sizes="[100, 200, 300, 400]"
       :page-size="100"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="tableData.total"
     >
     </el-pagination>
   </div>
 </template>
 <script>
+import gql from 'graphql-tag'
 export default {
   name: 'AdminDashboardList',
   data() {
     return {
+      page: 1,
+      limit: 20,
       search: '',
-      tableData: [
-        {
-          id: 1,
-          count: 5,
-          name: '测试看板',
-          user: '小白',
-          createdAt: '2020-09-05'
+      tableData: {
+        total: 0,
+        dahsboards: []
+      }
+    }
+  },
+  apollo: {
+    tableData: {
+      query: gql`
+        query($search: String, $limit: Int!, $page: Int!) {
+          tableData: adminDashboards(
+            search: $search
+            limit: $limit
+            page: $page
+          ) {
+            total
+            dashboards {
+              id
+              name
+              createdAt
+              devices {
+                id
+                number
+              }
+            }
+          }
         }
-      ],
-      currentPage: 1
+      `,
+      variables() {
+        return {
+          search: this.search,
+          limit: this.limit,
+          page: this.page
+        }
+      }
     }
   },
   methods: {
@@ -80,10 +112,10 @@ export default {
       console.log(id)
     },
     handleSizeChange(val) {
-      console.log(val)
+      this.limit = val
     },
     handleCurrentChange(val) {
-      console.log(val)
+      this.page = val
     }
   }
 }
