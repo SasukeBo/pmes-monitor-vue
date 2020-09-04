@@ -12,7 +12,7 @@ Vue.use(VueApollo)
 const AUTH_TOKEN = 'apollo-token'
 
 // Http endpoint
-const httpEndpoint = '/api/v1'
+const httpEndpoint = '/monitor/api/v1'
 
 // Config
 const defaultOptions = {
