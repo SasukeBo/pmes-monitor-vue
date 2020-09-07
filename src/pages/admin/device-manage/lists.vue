@@ -99,6 +99,7 @@ export default {
           }
         }
       `,
+      client: 'adminClient',
       variables() {
         return {
           search: this.search,

@@ -45,6 +45,8 @@
   text-align: center;
   background: #080b10;
   padding-bottom: 200px;
+  height: 100%;
+  overflow: auto;
 
   .page-link {
     display: flex;
@@ -120,6 +122,7 @@
       margin: auto;
       position: relative;
       top: -30px;
+      width: 90%;
     }
   }
 }

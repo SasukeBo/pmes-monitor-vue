@@ -49,18 +49,33 @@ const defaultOptions = {
   // clientState: { resolvers: { ... }, defaults: { ... } }
 }
 
+const adminOptions = {
+  // httpEndpoint: 'http://' + APIHost + '/api/v1/admin'
+  httpEndpoint: '/monitor/api/v1/admin'
+}
+
 // Call this in the Vue app file
 export function createProvider(options = {}) {
+  const adminClient = createApolloClient({
+    ...defaultOptions,
+    ...adminOptions,
+    ...options
+  })
+
   // Create apollo client
-  const { apolloClient, wsClient } = createApolloClient({
+  const defaultClient = createApolloClient({
     ...defaultOptions,
     ...options
   })
-  apolloClient.wsClient = wsClient
+  defaultClient.apolloClient.wsClient = defaultClient.wsClient
 
   // Create vue apollo provider
   const apolloProvider = new VueApollo({
-    defaultClient: apolloClient,
+    clients: {
+      adminClient: adminClient.apolloClient,
+      defaultClient: defaultClient.apolloClient
+    },
+    defaultClient: defaultClient.apolloClient,
     defaultOptions: {
       $query: {
         // fetchPolicy: 'cache-and-network',

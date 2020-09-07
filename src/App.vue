@@ -20,7 +20,7 @@ body,
 }
 
 #app {
-  overflow: auto;
+  overflow: hidden;
 }
 
 * {

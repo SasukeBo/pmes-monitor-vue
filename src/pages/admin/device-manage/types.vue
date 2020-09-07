@@ -108,6 +108,7 @@ export default {
           }
         }
       `,
+      client: 'adminClient',
       variables() {
         return {
           limit: this.limit,
@@ -130,6 +131,7 @@ export default {
               adminDeviceTypeCreate(name: $name)
             }
           `,
+          client: 'adminClient',
           variables: {
             name: this.form.name
           }
