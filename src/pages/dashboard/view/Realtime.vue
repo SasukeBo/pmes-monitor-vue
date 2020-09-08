@@ -43,6 +43,8 @@ export default {
             ng
             durations
             errors
+            lastProduceLogID
+            lastStatusLogID
           }
         }
       `,
