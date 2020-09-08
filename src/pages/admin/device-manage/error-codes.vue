@@ -103,6 +103,7 @@ export default {
           }
         }
       `,
+      client: 'adminClient',
       variables() {
         return {
           id: this.id
@@ -135,6 +136,7 @@ export default {
                 adminSaveErrorCode(id: $id, errors: $errors)
               }
             `,
+            client: 'adminClient',
             variables: {
               id: this.deviceType.errorCode.id,
               errors: this.tableData
@@ -157,6 +159,7 @@ export default {
                 adminDeviceTypeAddErrorCode(deviceTypeID: $id, errors: $errors)
               }
             `,
+            client: 'adminClient',
             variables: {
               id: this.id,
               errors: this.tableData

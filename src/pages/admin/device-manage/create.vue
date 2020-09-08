@@ -95,6 +95,7 @@ export default {
               adminCreateDevices(input: $input)
             }
           `,
+          client: 'adminClient',
           variables: {
             input: {
               deviceTypeID: this.form.deviceTypeID,
@@ -127,6 +128,7 @@ export default {
               }
             }
           `,
+          client: 'adminClient',
           variables: {
             search: val
           }

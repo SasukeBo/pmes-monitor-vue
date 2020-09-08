@@ -104,6 +104,7 @@ export default {
               }
             }
           `,
+          client: 'adminClient',
           variables: {
             search: val
           }
@@ -154,6 +155,7 @@ export default {
                   adminCreateDashboard(name: $name, deviceIDs: $deviceIDs)
                 }
               `,
+              client: 'adminClient',
               variables: {
                 ...this.form
               }
