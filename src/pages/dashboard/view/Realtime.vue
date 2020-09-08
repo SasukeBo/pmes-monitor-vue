@@ -6,9 +6,9 @@
     <div class="block-body">
       <div class="block-body__inner realtime-device-card-flex">
         <DeviceCard
-          v-for="i in 8"
-          :key="'device_' + i"
-          :status="status[i % 4]"
+          v-for="d in devices"
+          :key="'device_' + d.id"
+          :device="d"
         ></DeviceCard>
       </div>
     </div>
@@ -16,15 +16,41 @@
   </div>
 </template>
 <script>
+import gql from 'graphql-tag'
 import DeviceCard from './DeviceCard'
 export default {
   name: 'Realtime',
+  props: {
+    id: [String, Number]
+  },
   components: {
     DeviceCard
   },
   data() {
     return {
-      status: ['running', 'stopped', 'offline', 'error']
+      devices: []
+    }
+  },
+  apollo: {
+    devices: {
+      query: gql`
+        query($id: Int!) {
+          devices: dashboardDevices(id: $id) {
+            id
+            number
+            status
+            total
+            ng
+            durations
+            errors
+          }
+        }
+      `,
+      variables() {
+        return {
+          id: this.id
+        }
+      }
     }
   }
 }

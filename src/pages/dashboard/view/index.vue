@@ -2,7 +2,7 @@
   <div class="dashboard-view">
     <Overview></Overview>
     <DeviceErrorBar></DeviceErrorBar>
-    <Realtime></Realtime>
+    <Realtime :id="id"></Realtime>
   </div>
 </template>
 <script>
@@ -11,6 +11,9 @@ import DeviceErrorBar from './DeviceErrorBar'
 import Realtime from './Realtime'
 export default {
   name: 'DashboardView',
+  props: {
+    id: [String, Number]
+  },
   components: {
     Overview,
     Realtime,

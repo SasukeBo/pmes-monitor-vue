@@ -1,7 +1,14 @@
 <template>
   <div class="admin-device-type-error-code">
     <div class="operation">
-      <el-button size="small" type="primary">导入配置</el-button>
+      <el-upload
+        action="/monitor/api/v1/import_error_codes"
+        :on-success="handleImport"
+        :show-file-list="false"
+        class="upload-errors"
+      >
+        <el-button size="small" type="primary">导入配置</el-button>
+      </el-upload>
       <el-button size="small" type="danger">清除配置</el-button>
     </div>
 
@@ -126,6 +133,9 @@ export default {
     }
   },
   methods: {
+    handleImport(errors) {
+      this.tableData = errors
+    },
     submit() {
       if (this.deviceType.errorCode && this.deviceType.errorCode.id) {
         this.loading = true
@@ -203,8 +213,9 @@ export default {
     display: flex;
     margin-bottom: 24px;
 
-    .el-button:first-child {
+    .upload-errors {
       margin-left: auto;
+      margin-right: 16px;
     }
   }
 

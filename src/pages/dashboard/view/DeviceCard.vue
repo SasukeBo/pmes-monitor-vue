@@ -87,21 +87,26 @@
         <div class="status-pie" ref="chart"></div>
         <div class="status-text">
           <div style="padding: 12px 0">
-            <span style="color: #3CC69E; padding-right: 13px">运行：30%</span>
-            <span style="color: #5A48E0">离线：20%</span>
+            <span style="color: #3CC69E; padding-right: 8px"
+              >运行:{{ durationPercent(1) }}</span
+            >
+            <span style="color: #5A48E0">离线:{{ durationPercent(3) }}</span>
           </div>
           <div>
-            <span style="color: #FFB864; padding-right: 13px">停机：30%</span>
-            <span style="color: #FB7070">故障：20%</span>
+            <span style="color: #FFB864; padding-right: 8px"
+              >停机:{{ durationPercent(0) }}</span
+            >
+            <span style="color: #FB7070">故障:{{ durationPercent(2) }}</span>
           </div>
         </div>
       </div>
 
       <div class="device-number">{{ number }}</div>
       <div class="device-info">
-        <div>产量：312321</div>
-        <div>良率：80%</div>
-        <div>时间稼动率：85%</div>
+        <div>产量：{{ total }}</div>
+        <div>良率：{{ yieldRatio }}</div>
+        <div>时间稼动率：{{ activation }}</div>
+        <div>运行时长：{{ runningDuration }}</div>
       </div>
 
       <div class="link">
@@ -115,61 +120,98 @@ import echarts from 'echarts'
 export default {
   name: 'DeviceCard',
   props: {
-    status: String
+    device: Object
   },
   data() {
     return {
-      number: 'AJHG-124124-PROTRON',
-      message:
-        '故障是系统不能执行规定功能的状态。通常而言，故障是指系统中部分元器件功能失效而导致整个系统功能恶化的事件。设备的故障一般具有五个基本特征：层次性、传播性、放射性、延时性、不确定性等。故障是系统不能执行规定功能的状态。通常而言，故障是指系统中部分元器件功能失效而导致整个系统功能恶化的事件。设备的故障一般具有五个基本特征：层次性、传播性、放射性、延时性、不确定性等。故障是系统不能执行规定功能的状态。通常而言，故障是指系统中部分元器件功能失效而导致整个系统功能恶化的事件。设备的故障一般具有五个基本特征：层次性、传播性、放射性、延时性、不确定性等。',
+      number: '',
+      message: '',
+      total: 0,
+      ng: 0,
+      durations: [0, 0, 0, 0],
       statusMap: {
         running: '运行中',
         stopped: '停机',
         offline: '离线',
         error: '故障'
       },
-      chart: undefined,
-      option: {
-        color: ['#3cc69e', '#ffb864', '#766cc0', '#fb7070'],
-        series: [
-          {
-            name: '状态时间比',
-            type: 'pie',
-            radius: ['50%', '70%'],
-            hoverAnimation: false,
-            label: {
-              show: false
-            },
-            labelLine: {
-              show: false
-            },
-            data: [
-              {
-                value: 30,
-                name: '运行'
-              },
-              {
-                value: 30,
-                name: '停机'
-              },
-              {
-                value: 20,
-                name: '离线'
-              },
-              {
-                value: 20,
-                name: '故障'
-              }
-            ]
-          }
-        ]
+      status: '',
+      chart: undefined
+    }
+  },
+  computed: {
+    runningDuration() {
+      return (this.durations[1] / (60 * 60)).toFixed(1) + '小时'
+    },
+    yieldRatio() {
+      if (this.total > 0) {
+        return (((this.total - this.ng) * 100) / this.total).toFixed(2) + '%'
       }
+      return '0%'
+    },
+    activation() {
+      var power = this.durations[0] + this.durations[1] + this.durations[2]
+      if (power > 0) {
+        return ((this.durations[1] * 100) / power).toFixed(2) + '%'
+      }
+      return '0%'
+    },
+    totalDuration() {
+      var sum = 0
+      this.durations.forEach((i) => (sum = sum + i))
+      return sum
     }
   },
   mounted() {
-    if (this.status !== 'error') {
+    if (this.device.status !== 'error') {
       this.chart = echarts.init(this.$refs.chart)
-      this.chart.setOption(this.option)
+      this.renderChart()
+    }
+  },
+  created() {
+    this.freshData(this.device)
+  },
+  methods: {
+    durationPercent(i) {
+      if (this.totalDuration > 0) {
+        return ((this.durations[i] * 100) / this.totalDuration).toFixed(1) + '%'
+      }
+      return '0%'
+    },
+    freshData(d) {
+      this.status = d.status
+      this.number = d.number
+      this.message = d.errors.join('，')
+      this.total = d.total
+      this.ng = d.ng
+      this.durations = d.durations || [0, 0, 0, 0]
+    },
+    renderChart() {
+      var option = {
+        color: this.assembleColor(),
+        series: this.assembleSeries(this.device.durations)
+      }
+      this.chart.setOption(option)
+    },
+    assembleColor() {
+      return ['#ffb864', '#3cc69e', '#fb7070', '#766cc0']
+    },
+    assembleSeries(durations) {
+      return [
+        {
+          name: '状态时间比',
+          type: 'pie',
+          radius: ['50%', '70%'],
+          hoverAnimation: false,
+          label: {
+            show: false
+          },
+          labelLine: {
+            show: false
+          },
+          data: durations
+        }
+      ]
     }
   }
 }
