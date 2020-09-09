@@ -82,7 +82,8 @@
       <div class="device-number">{{ number }}</div>
       <div class="message">{{ message }}</div>
     </div>
-    <div v-else class="card-body">
+
+    <div v-show="status !== 'error'" class="card-body">
       <div class="status-percent">
         <div class="status-pie" ref="chart"></div>
         <div class="status-text">
