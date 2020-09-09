@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-view">
-    <Overview></Overview>
-    <DeviceErrorBar></DeviceErrorBar>
+    <Overview :id="id"></Overview>
+    <DeviceErrorBar :id="id"></DeviceErrorBar>
     <Realtime :id="id"></Realtime>
   </div>
 </template>
@@ -26,6 +26,8 @@ export default {
   max-width: 1200px;
   margin: auto;
   padding-top: 62px;
+  background: url('~@/assets/images/beijing@2x.png');
+  background-size: cover;
 
   .icon-flex {
     display: flex;
