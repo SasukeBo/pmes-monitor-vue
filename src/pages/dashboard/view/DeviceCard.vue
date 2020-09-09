@@ -176,7 +176,9 @@ export default {
     this.pid = d.lastProduceLogID
     var now = new Date()
     var lt = new Date(d.lastStatusTime)
-    lt.setHours(lt.getHours() + 8)
+    if (process.env.NODE_ENV === 'development') {
+      lt.setHours(lt.getHours() + 8)
+    }
     this.updateDuration((now - lt) / 1000)
     this.startFresh()
     this.calculateDurations()
