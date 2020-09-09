@@ -117,6 +117,7 @@
 </template>
 <script>
 import echarts from 'echarts'
+import gql from 'graphql-tag'
 export default {
   name: 'DeviceCard',
   props: {
@@ -135,31 +136,22 @@ export default {
         offline: '离线',
         error: '故障'
       },
+      options: ['stopped', 'running', 'offline', 'error'],
+      pid: 0,
+      sid: 0,
       status: '',
-      chart: undefined
+      chart: undefined,
+      fresher: undefined,
+      freshLock: false,
+      runningDuration: '',
+      yieldRatio: '',
+      activation: '',
+      totalDuration: 0
     }
   },
-  computed: {
-    runningDuration() {
-      return (this.durations[1] / (60 * 60)).toFixed(1) + '小时'
-    },
-    yieldRatio() {
-      if (this.total > 0) {
-        return (((this.total - this.ng) * 100) / this.total).toFixed(2) + '%'
-      }
-      return '0%'
-    },
-    activation() {
-      var power = this.durations[0] + this.durations[1] + this.durations[2]
-      if (power > 0) {
-        return ((this.durations[1] * 100) / power).toFixed(2) + '%'
-      }
-      return '0%'
-    },
-    totalDuration() {
-      var sum = 0
-      this.durations.forEach((i) => (sum = sum + i))
-      return sum
+  watch: {
+    durations(val) {
+      console.log(val)
     }
   },
   mounted() {
@@ -169,22 +161,59 @@ export default {
     }
   },
   created() {
-    this.freshData(this.device)
+    var d = this.device
+    this.status = d.status
+    this.number = d.number
+    this.message = d.errors.join('，')
+    this.total = d.total
+    this.ng = d.ng
+    if (d.durations) {
+      for (var i = 0; i < 4; i++) {
+        this.durations[i] += d.durations[i]
+      }
+    }
+    this.sid = d.lastStatusLogID
+    this.pid = d.lastProduceLogID
+    var now = new Date()
+    var lt = new Date(d.lastStatusTime)
+    lt.setHours(lt.getHours() + 8)
+    this.updateDuration((now - lt) / 1000)
+    this.startFresh()
+    this.calculateDurations()
+    this.durations.forEach((i) => (this.totalDuration += i))
+  },
+  beforeDestroy() {
+    clearInterval(this.fresher)
   },
   methods: {
+    calculateDurations() {
+      this.runningDuration = (this.durations[1] / (60 * 60)).toFixed(1) + '小时'
+      if (this.total > 0) {
+        this.yieldRatio =
+          (((this.total - this.ng) * 100) / this.total).toFixed(2) + '%'
+      } else {
+        this.yieldRatio = '0%'
+      }
+      var power = this.durations[0] + this.durations[1] + this.durations[2]
+      if (power > 0) {
+        this.activation = ((this.durations[1] * 100) / power).toFixed(2) + '%'
+      } else {
+        this.activation = '0%'
+      }
+    },
+    updateDuration(duration) {
+      var index = this.options.findIndex((i) => i === this.status)
+      if (index >= 0 && index < 4) {
+        this.durations[index] += duration
+      }
+      this.totalDuration += duration
+      this.calculateDurations()
+    },
     durationPercent(i) {
       if (this.totalDuration > 0) {
         return ((this.durations[i] * 100) / this.totalDuration).toFixed(1) + '%'
       }
       return '0%'
-    },
-    freshData(d) {
-      this.status = d.status
-      this.number = d.number
-      this.message = d.errors.join('，')
-      this.total = d.total
-      this.ng = d.ng
-      this.durations = d.durations || [0, 0, 0, 0]
     },
     renderChart() {
       var option = {
@@ -212,6 +241,61 @@ export default {
           data: durations
         }
       ]
+    },
+    startFresh() {
+      this.fresher = setInterval(() => {
+        if (this.freshLock) return
+        this.freshLock = true
+        this.$apollo
+          .query({
+            query: gql`
+              query($id: Int!, $pid: Int!, $sid: Int!) {
+                response: dashboardDeviceFresh(id: $id, pid: $pid, sid: $sid) {
+                  produceLogs {
+                    id
+                    total
+                    ng
+                  }
+                  statusLogs {
+                    id
+                    messages
+                    status
+                  }
+                }
+              }
+            `,
+            fetchPolicy: 'network-only',
+            variables: {
+              id: this.device.id,
+              pid: this.pid,
+              sid: this.sid
+            }
+          })
+          .then(({ data: { response } }) => {
+            if (response.produceLogs) {
+              response.produceLogs.forEach((l) => {
+                if (l.id > this.pid) this.pid = l.id
+                this.total = this.total + l.total
+                this.ng = this.ng + l.ng
+              })
+            }
+
+            if (response.statusLogs) {
+              response.statusLogs.forEach((l) => {
+                if (l.id > this.sid) this.sid = l.id
+                this.status = l.status
+                this.message = l.messages.join('，')
+              })
+            }
+            this.freshLock = false
+          })
+          .catch((e) => {
+            this.freshLock = false
+            console.log(e)
+          })
+
+        this.updateDuration(1) // 刷新状态持续时间
+      }, 1000)
     }
   }
 }

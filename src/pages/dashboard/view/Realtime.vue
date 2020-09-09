@@ -45,6 +45,7 @@ export default {
             errors
             lastProduceLogID
             lastStatusLogID
+            lastStatusTime
           }
         }
       `,
