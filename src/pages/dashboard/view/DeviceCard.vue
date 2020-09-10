@@ -91,13 +91,13 @@
             <span style="color: #3CC69E; padding-right: 8px"
               >运行:{{ durationPercent(1) }}</span
             >
-            <span style="color: #5A48E0">离线:{{ durationPercent(3) }}</span>
+            <span style="color: #5A48E0">离线:{{ durationPercent(2) }}</span>
           </div>
           <div>
             <span style="color: #FFB864; padding-right: 8px"
               >停机:{{ durationPercent(0) }}</span
             >
-            <span style="color: #FB7070">故障:{{ durationPercent(2) }}</span>
+            <span style="color: #FB7070">故障:{{ durationPercent(3) }}</span>
           </div>
         </div>
       </div>
