@@ -91,13 +91,13 @@
             <span style="color: #3CC69E; padding-right: 8px"
               >运行:{{ durationPercent(1) }}</span
             >
-            <span style="color: #5A48E0">离线:{{ durationPercent(2) }}</span>
+            <span style="color: #5A48E0">离线:{{ durationPercent(3) }}</span>
           </div>
           <div>
             <span style="color: #FFB864; padding-right: 8px"
               >停机:{{ durationPercent(0) }}</span
             >
-            <span style="color: #FB7070">故障:{{ durationPercent(3) }}</span>
+            <span style="color: #FB7070">故障:{{ durationPercent(2) }}</span>
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default {
         offline: '离线',
         error: '故障'
       },
-      options: ['stopped', 'running', 'offline', 'error'],
+      options: ['stopped', 'running', 'error', 'offline'],
       pid: 0,
       sid: 0,
       status: '',
@@ -226,6 +226,7 @@ export default {
       this.chart.setOption(option)
     },
     assembleColor() {
+      // 停机 运行 故障 离线
       return ['#ffb864', '#3cc69e', '#fb7070', '#766cc0']
     },
     assembleSeries(durations) {
