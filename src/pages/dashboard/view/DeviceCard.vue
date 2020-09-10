@@ -173,6 +173,7 @@ export default {
         this.durations[i] += d.durations[i]
       }
     }
+    this.durations.forEach((i) => (this.totalDuration += i))
     this.sid = d.lastStatusLogID
     this.pid = d.lastProduceLogID
     var now = new Date()
@@ -183,7 +184,6 @@ export default {
     this.updateDuration((now - lt) / 1000)
     this.startFresh()
     this.calculateDurations()
-    this.durations.forEach((i) => (this.totalDuration += i))
   },
   beforeDestroy() {
     clearInterval(this.fresher)
