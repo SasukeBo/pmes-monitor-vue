@@ -308,7 +308,8 @@ export default {
   max-width: 270px;
   min-width: 270px;
   flex: auto;
-  margin: auto;
+  margin-right: 12px;
+  margin-left: 12px;
   background: #121a26;
   margin-bottom: 28px;
   text-align: left;

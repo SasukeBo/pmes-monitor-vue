@@ -4,7 +4,13 @@
       <div class="block-header__title">设备状态实时监控</div>
     </div>
     <div class="block-body">
-      <div class="block-body__inner realtime-device-card-flex">
+      <div
+        class="block-body__inner realtime-device-card-flex"
+        v-loading="$apollo.queries.devices.loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+      >
         <DeviceCard
           v-for="d in devices"
           :key="'device_' + d.id"
@@ -49,6 +55,7 @@ export default {
           }
         }
       `,
+      fetchPolicy: 'network-only',
       variables() {
         return {
           id: this.id
@@ -66,6 +73,7 @@ export default {
     flex-wrap: wrap;
     padding: 12px;
     margin-bottom: -40px;
+    margin-right: -12px;
   }
 }
 </style>

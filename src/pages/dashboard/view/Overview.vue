@@ -85,7 +85,7 @@ export default {
     this.startStatus()
     this.startSummary()
   },
-  beforeDestory() {
+  beforeDestroy() {
     clearInterval(this.statusFresher)
     clearInterval(this.summaryFresher)
   },

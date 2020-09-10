@@ -8,35 +8,74 @@
     </div>
 
     <div class="card-content">
-      <div class="card-header">1609自动化监测设备</div>
+      <div class="card-header">{{ device.deviceType }}</div>
       <div class="status-icon">
-        <img src="../images/pi-lixian@2x.png" v-if="index % 4 === 0" />
-        <img src="../images/pi-tingji@2x.png" v-if="index % 4 === 1" />
-        <img src="../images/pi-yunxing@2x.png" v-if="index % 4 === 2" />
-        <img src="../images/pi-guzhang@2x.png" v-if="index % 4 === 3" />
+        <img
+          src="../images/pi-lixian@2x.png"
+          v-if="device.status === 'offline'"
+        />
+        <img
+          src="../images/pi-tingji@2x.png"
+          v-if="device.status === 'stopped'"
+        />
+        <img
+          src="../images/pi-yunxing@2x.png"
+          v-if="device.status === 'running'"
+        />
+        <img
+          src="../images/pi-guzhang@2x.png"
+          v-if="device.status === 'error'"
+        />
       </div>
       <div class="device-statistics">
         <div class="device-statistics__item">
-          <span>OEE</span>
-          <span>53.42%</span>
+          <span>产量</span>
+          <span>{{ device.total }}</span>
         </div>
         <div class="device-statistics__item">
           <span>稼动率</span>
-          <span>20.38%</span>
+          <span>{{ activation }}</span>
         </div>
         <div class="device-statistics__item">
           <span>良率</span>
-          <span>16.50%</span>
+          <span>{{ yieldRatio }}</span>
         </div>
       </div>
 
       <div class="device-infomation">
-        <div>ZJ-1609-JCSB-01</div>
-        <div>富诚达A1 4楼 普创智控</div>
+        <div>{{ device.number }}</div>
+        <div>{{ device.address }}</div>
       </div>
     </div>
   </div>
 </template>
+<script>
+export default {
+  name: 'HomeOverviewListCard',
+  props: {
+    device: Object
+  },
+  computed: {
+    activation() {
+      if (this.device && this.device.durations) {
+        var d = this.device.durations
+        var total = d[0] + d[1] + d[2]
+        if (total > 0) {
+          return ((d[1] * 100) / total).toFixed(2) + '%'
+        }
+      }
+      return '0%'
+    },
+    yieldRatio() {
+      if (this.device && this.device.total > 0) {
+        var d = this.device
+        return (((d.total - d.ng) * 100) / d.total).toFixed(2) + '%'
+      }
+      return '0%'
+    }
+  }
+}
+</script>
 <style lang="scss">
 .home-overview-list-card {
   margin: 24px 12px 0 12px;
@@ -118,11 +157,3 @@
   }
 }
 </style>
-<script>
-export default {
-  name: 'HomeOverviewListCard',
-  props: {
-    index: Number
-  }
-}
-</script>
