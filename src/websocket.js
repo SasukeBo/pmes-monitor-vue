@@ -9,6 +9,9 @@ export class WsConn {
     this.healthCheck()
   }
   connect() {
+    if (process.env.NODE_ENV !== 'development') {
+      this.host = document.location.host
+    }
     this.conn = new WebSocket(`ws://${this.host}/monitor/websocket`)
     this.onMessage()
   }
