@@ -54,7 +54,10 @@ const defaultOptions = {
 
 const adminOptions = {
   // httpEndpoint: 'http://' + APIHost + '/api/v1/admin'
-  httpEndpoint: '/monitor/api/v1/admin'
+  httpEndpoint:
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:44764/monitor/api/v1/admin'
+      : '/monitor/api/v1/admin'
 }
 
 // Call this in the Vue app file

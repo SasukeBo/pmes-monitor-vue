@@ -7,25 +7,25 @@
       <div class="block-body__inner icon-flex">
         <div class="flex-item">
           <img class="icon" src="~@/pages/dashboard/images/yunxing@2x.png" />
-          <div class="numerical">{{ running }}</div>
+          <div class="numerical">{{ status.running }}</div>
           <div class="label">运行</div>
         </div>
 
         <div class="flex-item">
           <img class="icon" src="~@/pages/dashboard/images/tingji@2x.png" />
-          <div class="numerical">{{ stopped }}</div>
+          <div class="numerical">{{ status.stopped }}</div>
           <div class="label">停机</div>
         </div>
 
         <div class="flex-item">
           <img class="icon" src="~@/pages/dashboard/images/lixian@2x.png" />
-          <div class="numerical">{{ offline }}</div>
+          <div class="numerical">{{ status.offline }}</div>
           <div class="label">离线</div>
         </div>
 
         <div class="flex-item">
           <img class="icon" src="~@/pages/dashboard/images/guzhang@2x.png" />
-          <div class="numerical">{{ error }}</div>
+          <div class="numerical">{{ status.error }}</div>
           <div class="label">故障</div>
         </div>
 
@@ -71,59 +71,48 @@ export default {
       total: 0,
       yieldRatio: 0,
       activation: 0,
-      running: 0,
-      stopped: 0,
-      offline: 0,
-      error: 0,
+      status: {
+        running: 0,
+        stopped: 0,
+        offline: 0,
+        error: 0
+      },
       statusFresher: undefined,
       statusLock: false,
       summaryFresher: undefined,
       summaryLock: false
     }
   },
+  apollo: {
+    status: {
+      query: gql`
+        query($id: Int!) {
+          status: dashboardDeviceStatus(id: $id) {
+            stopped
+            running
+            offline
+            error
+          }
+        }
+      `,
+      fetchPolicy: 'network-only',
+      variables() {
+        return {
+          id: this.id
+        }
+      }
+    }
+  },
   created() {
-    this.startStatus()
     this.startSummary()
   },
   beforeDestroy() {
-    clearInterval(this.statusFresher)
     clearInterval(this.summaryFresher)
   },
   methods: {
-    startStatus() {
-      console.log('startStatus')
-      this.statusFresher = setInterval(() => {
-        if (this.statusLock) return
-        this.statusLock = true
-        this.$apollo
-          .query({
-            query: gql`
-              query($id: Int!) {
-                response: dashboardDeviceStatus(id: $id) {
-                  stopped
-                  running
-                  offline
-                  error
-                }
-              }
-            `,
-            fetchPolicy: 'network-only',
-            variables: {
-              id: this.id
-            }
-          })
-          .then(({ data: { response } }) => {
-            this.running = response.running
-            this.stopped = response.stopped
-            this.offline = response.offline
-            this.error = response.error
-            this.statusLock = false
-          })
-          .catch((e) => {
-            console.log(e)
-            this.statusLock = false
-          })
-      }, 1000)
+    updateStatus(old, n) {
+      this.status[old]--
+      this.status[n]++
     },
     startSummary() {
       this.fetchSummary()
@@ -159,7 +148,7 @@ export default {
           this.summaryLock = false
         })
         .catch((e) => {
-          console.loe(e)
+          console.log(e)
           this.summaryLock = false
         })
     }

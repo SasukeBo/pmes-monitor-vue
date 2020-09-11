@@ -13,6 +13,7 @@
       >
         <DeviceCard
           v-for="d in devices"
+          @status-change="handleStatusChange"
           :key="'device_' + d.id"
           :device="d"
         ></DeviceCard>
@@ -61,6 +62,11 @@ export default {
           id: this.id
         }
       }
+    }
+  },
+  methods: {
+    handleStatusChange({ old, n }) {
+      this.$emit('status-change', { old, n })
     }
   }
 }

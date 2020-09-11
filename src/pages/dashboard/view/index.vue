@@ -1,8 +1,8 @@
 <template>
   <div class="dashboard-view">
-    <Overview :id="id"></Overview>
+    <Overview :id="id" ref="overview"></Overview>
     <DeviceErrorBar :id="id"></DeviceErrorBar>
-    <Realtime :id="id"></Realtime>
+    <Realtime :id="id" @status-change="handleDeviceStatusChange"></Realtime>
   </div>
 </template>
 <script>
@@ -18,6 +18,11 @@ export default {
     Overview,
     Realtime,
     DeviceErrorBar
+  },
+  methods: {
+    handleDeviceStatusChange({ old, n }) {
+      this.$refs.overview.updateStatus(old, n)
+    }
   }
 }
 </script>

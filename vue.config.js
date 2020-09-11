@@ -5,6 +5,9 @@ module.exports = {
     }
   },
   filenameHashing: true,
+  devServer: {
+    public: 'localhost:8080'
+  },
   pages: {
     monitor: {
       entry: 'src/main.js',

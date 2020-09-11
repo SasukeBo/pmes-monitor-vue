@@ -69,7 +69,8 @@ export default {
         offline: 0,
         error: 0
       },
-      recentView: []
+      recentView: [],
+      devices: []
     }
   },
   apollo: {
@@ -110,8 +111,7 @@ export default {
   },
   created() {
     this.recentView = GetDeviceIDs()
-  },
-  methods: {}
+  }
 }
 </script>
 <style lang="scss">

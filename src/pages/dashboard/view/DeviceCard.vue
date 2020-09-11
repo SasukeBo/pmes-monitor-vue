@@ -80,7 +80,14 @@
 
     <div v-if="status === 'error'" class="card-body error-body">
       <div class="device-number">{{ number }}</div>
-      <div class="message">{{ message }}</div>
+      <div
+        class="message"
+        v-loading="messageLoading"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+      >
+        <div v-for="(m, i) in messages" :key="i">{{ `${i + 1}. ${m}` }}</div>
+      </div>
     </div>
 
     <div v-show="status !== 'error'" class="card-body">
@@ -127,7 +134,7 @@ export default {
   data() {
     return {
       number: '',
-      message: '',
+      messages: [],
       total: 0,
       ng: 0,
       durations: [0, 0, 0, 0],
@@ -142,17 +149,11 @@ export default {
       sid: 0,
       status: '',
       chart: undefined,
-      fresher: undefined,
-      freshLock: false,
       runningDuration: '',
       yieldRatio: '',
       activation: '',
-      totalDuration: 0
-    }
-  },
-  watch: {
-    durations(val) {
-      console.log(val)
+      totalDuration: 0,
+      messageLoading: false
     }
   },
   mounted() {
@@ -165,30 +166,53 @@ export default {
     var d = this.device
     this.status = d.status
     this.number = d.number
-    this.message = d.errors.join('，')
+    this.messages = d.errors
     this.total = d.total
     this.ng = d.ng
-    if (d.durations) {
-      for (var i = 0; i < 4; i++) {
-        this.durations[i] += d.durations[i]
-      }
-    }
-    this.durations.forEach((i) => (this.totalDuration += i))
-    this.sid = d.lastStatusLogID
-    this.pid = d.lastProduceLogID
-    var now = new Date()
-    var lt = new Date(d.lastStatusTime)
-    if (process.env.NODE_ENV === 'development') {
-      lt.setHours(lt.getHours() + 8)
-    }
-    this.updateDuration((now - lt) / 1000)
-    this.startFresh()
+    this.durations = d.durations
     this.calculateDurations()
+
+    this.$ws.subscribe(this.device.id, (data) => {
+      var n = this.options[data.Status]
+      if (this.status != n) {
+        this.$emit('status-change', { old: this.status, n })
+        this.status = n
+      }
+      this.total = data.Total
+      this.ng = data.Ng
+      this.durations[data.Status]++
+      this.calculateDurations()
+      if (this.chart) this.renderChart()
+      if (this.status === 'error') this.handleError(data.ErrorIndex)
+    })
   },
   beforeDestroy() {
-    clearInterval(this.fresher)
+    this.$ws.unsubscribe(this.device.id)
   },
   methods: {
+    handleError(idxs) {
+      this.messageLoading = true
+      this.$apollo
+        .query({
+          query: gql`
+            query($deviceID: Int!, $errorIdxs: [Int!]!) {
+              response: deviceErrors(id: $deviceID, idxs: $errorIdxs)
+            }
+          `,
+          variables: {
+            deviceID: this.device.id,
+            errorIdxs: idxs || []
+          }
+        })
+        .then(({ data: { response } }) => {
+          this.messages = response
+          this.messageLoading = false
+        })
+        .catch((e) => {
+          console.log(e)
+          this.messageLoading = false
+        })
+    },
     calculateDurations() {
       this.runningDuration = (this.durations[1] / (60 * 60)).toFixed(1) + '小时'
       if (this.total > 0) {
@@ -203,14 +227,7 @@ export default {
       } else {
         this.activation = '0%'
       }
-    },
-    updateDuration(duration) {
-      var index = this.options.findIndex((i) => i === this.status)
-      if (index >= 0 && index < 4) {
-        this.durations[index] += duration
-      }
-      this.totalDuration += duration
-      this.calculateDurations()
+      this.totalDuration = power + this.durations[3]
     },
     durationPercent(i) {
       if (this.totalDuration > 0) {
@@ -218,10 +235,13 @@ export default {
       }
       return '0%'
     },
+    refreshChart() {
+      this.chart.setOption({ series: this.assembleSeries(this.durations) })
+    },
     renderChart() {
       var option = {
         color: this.assembleColor(),
-        series: this.assembleSeries(this.device.durations)
+        series: this.assembleSeries(this.durations)
       }
       this.chart.setOption(option)
     },
@@ -245,61 +265,6 @@ export default {
           data: durations
         }
       ]
-    },
-    startFresh() {
-      this.fresher = setInterval(() => {
-        if (this.freshLock) return
-        this.freshLock = true
-        this.$apollo
-          .query({
-            query: gql`
-              query($id: Int!, $pid: Int!, $sid: Int!) {
-                response: dashboardDeviceFresh(id: $id, pid: $pid, sid: $sid) {
-                  produceLogs {
-                    id
-                    total
-                    ng
-                  }
-                  statusLogs {
-                    id
-                    messages
-                    status
-                  }
-                }
-              }
-            `,
-            fetchPolicy: 'network-only',
-            variables: {
-              id: this.device.id,
-              pid: this.pid,
-              sid: this.sid
-            }
-          })
-          .then(({ data: { response } }) => {
-            if (response.produceLogs) {
-              response.produceLogs.forEach((l) => {
-                if (l.id > this.pid) this.pid = l.id
-                this.total = this.total + l.total
-                this.ng = this.ng + l.ng
-              })
-            }
-
-            if (response.statusLogs) {
-              response.statusLogs.forEach((l) => {
-                if (l.id > this.sid) this.sid = l.id
-                this.status = l.status
-                this.message = l.messages.join('，')
-              })
-            }
-            this.freshLock = false
-          })
-          .catch((e) => {
-            this.freshLock = false
-            console.log(e)
-          })
-
-        this.updateDuration(1) // 刷新状态持续时间
-      }, 1000)
     }
   }
 }

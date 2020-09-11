@@ -10,27 +10,15 @@
     <div class="card-content">
       <div class="card-header">{{ device.deviceType }}</div>
       <div class="status-icon">
-        <img
-          src="../images/pi-lixian@2x.png"
-          v-if="device.status === 'offline'"
-        />
-        <img
-          src="../images/pi-tingji@2x.png"
-          v-if="device.status === 'stopped'"
-        />
-        <img
-          src="../images/pi-yunxing@2x.png"
-          v-if="device.status === 'running'"
-        />
-        <img
-          src="../images/pi-guzhang@2x.png"
-          v-if="device.status === 'error'"
-        />
+        <img src="../images/pi-lixian@2x.png" v-if="status === 'offline'" />
+        <img src="../images/pi-tingji@2x.png" v-if="status === 'stopped'" />
+        <img src="../images/pi-yunxing@2x.png" v-if="status === 'running'" />
+        <img src="../images/pi-guzhang@2x.png" v-if="status === 'error'" />
       </div>
       <div class="device-statistics">
         <div class="device-statistics__item">
           <span>产量</span>
-          <span>{{ device.total }}</span>
+          <span>{{ total }}</span>
         </div>
         <div class="device-statistics__item">
           <span>稼动率</span>
@@ -55,21 +43,46 @@ export default {
   props: {
     device: Object
   },
+  data() {
+    return {
+      status: 'offline',
+      total: 0,
+      ng: 0,
+      durations: [0, 0, 0, 0],
+      options: ['stopped', 'running', 'error', 'offline'],
+      activation: ''
+    }
+  },
   computed: {
-    activation() {
-      if (this.device && this.device.durations) {
-        var d = this.device.durations
-        var total = d[0] + d[1] + d[2]
-        if (total > 0) {
-          return ((d[1] * 100) / total).toFixed(2) + '%'
-        }
+    yieldRatio() {
+      if (this.total > 0) {
+        return (((this.total - this.ng) * 100) / this.total).toFixed(2) + '%'
       }
       return '0%'
-    },
-    yieldRatio() {
-      if (this.device && this.device.total > 0) {
-        var d = this.device
-        return (((d.total - d.ng) * 100) / d.total).toFixed(2) + '%'
+    }
+  },
+  created() {
+    this.status = this.device.status
+    this.total = this.device.total
+    this.ng = this.device.ng
+    this.durations = this.device.durations
+    this.calActivation(this.durations)
+    this.$ws.subscribe(this.device.id, (data) => {
+      this.status = this.options[data.Status]
+      this.total = data.Total
+      this.ng = data.Ng
+      this.durations[data.Status]++
+      this.activation = this.calActivation(this.durations)
+    })
+  },
+  beforeDestroy() {
+    this.$ws.unsubscribe(this.device.id)
+  },
+  methods: {
+    calActivation(d) {
+      var total = d[0] + d[1] + d[2]
+      if (total > 0) {
+        return ((d[1] * 100) / total).toFixed(2) + '%'
       }
       return '0%'
     }
