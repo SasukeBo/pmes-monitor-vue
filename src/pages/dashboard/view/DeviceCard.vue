@@ -79,7 +79,7 @@
     </div>
 
     <div v-if="status === 'error'" class="card-body error-body">
-      <div class="device-number">{{ number }}</div>
+      <div class="device-number">{{ device.number }}</div>
       <div
         class="message"
         v-loading="messageLoading"
@@ -90,7 +90,7 @@
       </div>
     </div>
 
-    <div v-show="status !== 'error'" class="card-body">
+    <div class="card-body">
       <div class="status-percent">
         <div class="status-pie" ref="chart"></div>
         <div class="status-text">
@@ -109,7 +109,12 @@
         </div>
       </div>
 
-      <div class="device-number">{{ number }}</div>
+      <div class="device-number">
+        <span style="margin-right: 16px">{{ device.number }}</span>
+        <span style="font-size: 14px; color: #aaa">{{
+          device.deviceType || '1069'
+        }}</span>
+      </div>
       <div class="device-info">
         <div>产量：{{ total }}</div>
         <div>良率：{{ yieldRatio }}</div>
@@ -133,7 +138,6 @@ export default {
   },
   data() {
     return {
-      number: '',
       messages: [],
       total: 0,
       ng: 0,
@@ -165,7 +169,6 @@ export default {
   created() {
     var d = this.device
     this.status = d.status
-    this.number = d.number
     this.messages = d.errors
     this.total = d.total
     this.ng = d.ng
@@ -185,6 +188,11 @@ export default {
       if (this.chart) this.renderChart()
       if (this.status === 'error') this.handleError(data.ErrorIndex)
     })
+  },
+  watch: {
+    status() {
+      if (this.chart) this.renderChart()
+    }
   },
   beforeDestroy() {
     this.$ws.unsubscribe(this.device.id)
@@ -235,9 +243,6 @@ export default {
       }
       return '0%'
     },
-    refreshChart() {
-      this.chart.setOption({ series: this.assembleSeries(this.durations) })
-    },
     renderChart() {
       var option = {
         color: this.assembleColor(),
@@ -279,6 +284,7 @@ export default {
   background: #121a26;
   margin-bottom: 28px;
   text-align: left;
+  position: relative;
 
   .card-body {
     padding: 18px 24px;
@@ -326,6 +332,11 @@ export default {
 
   .error-body {
     color: #fb7070;
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+    background: #131b26;
+    opacity: 0.9;
 
     .device-number {
       font-size: 16px;

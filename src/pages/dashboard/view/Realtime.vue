@@ -49,6 +49,7 @@ export default {
             total
             ng
             durations
+            deviceType
             errors
           }
         }
