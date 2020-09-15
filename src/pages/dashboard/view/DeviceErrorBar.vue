@@ -138,8 +138,6 @@ export default {
       }
     },
     assembleSeries(data) {
-      var border = data.map(() => 1)
-
       return [
         {
           data,
@@ -153,7 +151,7 @@ export default {
               },
               {
                 offset: 0,
-                color: 'rgb(59, 227, 237, 0.4)'
+                color: 'rgb(59, 227, 237, 0.8)'
               }
             ])
           },
@@ -166,14 +164,6 @@ export default {
             itemStyle: {
               color: '3BE3ED'
             }
-          }
-        },
-        {
-          data: border,
-          stack: 'one',
-          type: 'bar',
-          itemStyle: {
-            color: '#3BE3ED'
           }
         }
       ]
