@@ -25,7 +25,7 @@
           element-loading-background="rgba(0, 0, 0, 0.8)"
         >
           <DeviceCard
-            v-for="d in devices"
+            v-for="d in devices.slice(0, 8)"
             @status-change="handleStatusChange"
             @message-propt="handleMessage"
             :key="'device_' + d.id"
@@ -213,8 +213,16 @@ export default {
     clearInterval(this.summaryFresher)
   },
   methods: {
-    handleMessage({ messages, number }) {
+    handleMessage({ id, messages, number }) {
       this.messages.unshift({ messages, number })
+      var index = this.devices.findIndex((d) => d.id === id)
+      if (index > -1) {
+        if (this.devices.length > 8) {
+          var d = this.devices[index]
+          this.devices.splice(index, 1)
+          this.devices.unshift(d)
+        }
+      }
     },
     handleStatusChange({ old, n }) {
       this.status[old]--

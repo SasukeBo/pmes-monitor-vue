@@ -161,10 +161,8 @@ export default {
     }
   },
   mounted() {
-    if (this.device.status !== 'error') {
-      this.chart = echarts.init(this.$refs.chart)
-      this.renderChart()
-    }
+    this.chart = echarts.init(this.$refs.chart)
+    this.renderChart()
   },
   created() {
     var d = this.device
