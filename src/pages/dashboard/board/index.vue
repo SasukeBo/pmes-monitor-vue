@@ -117,13 +117,13 @@
             <div class="block-body__inner">
               <div
                 class="message-item"
-                v-for="(i, m) in messages"
+                v-for="(m, i) in messages"
                 :key="'message' + i"
               >
                 <div class="device-number">
                   <span class="item-dot"></span>{{ m.number }}
                 </div>
-                <div class="messages">{{ m.message }}</div>
+                <div class="messages">{{ m.messages.join('，') }}</div>
               </div>
             </div>
           </div>
