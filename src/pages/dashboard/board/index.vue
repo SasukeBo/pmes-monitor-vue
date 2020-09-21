@@ -121,7 +121,7 @@
                 :key="'message' + i"
               >
                 <div class="device-number">
-                  <span class="item-dot"></span>{{ m.number }}
+                  <span class="item-dot"></span>{{ m.number }} {{m.time}}
                 </div>
                 <div class="messages">{{ m.messages.join('，') }}</div>
               </div>
@@ -214,7 +214,8 @@ export default {
   },
   methods: {
     handleMessage({ id, messages, number }) {
-      this.messages.unshift({ messages, number })
+      var t = new Date()
+      this.messages.unshift({ messages, number, time: t.toLocaleTimeString() })
       var index = this.devices.findIndex((d) => d.id === id)
       if (index > -1) {
         if (this.devices.length > 8) {
