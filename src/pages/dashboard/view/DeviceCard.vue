@@ -215,6 +215,11 @@ export default {
         .then(({ data: { response } }) => {
           this.messages = response
           this.messageLoading = false
+          this.$emit('message-propt', {
+            id: this.device.id,
+            messages: response,
+            number: this.device.number
+          })
         })
         .catch((e) => {
           console.log(e)
@@ -279,8 +284,7 @@ export default {
   max-width: 270px;
   min-width: 270px;
   flex: auto;
-  margin-right: 12px;
-  margin-left: 12px;
+  margin-right: auto;
   background: #121a26;
   margin-bottom: 28px;
   text-align: left;
@@ -367,6 +371,7 @@ export default {
 
   .header {
     height: 40px;
+    line-height: 40px;
     font-size: 16px;
     font-weight: bold;
     color: #fff;

@@ -1,5 +1,11 @@
 <template>
   <div class="dashboard-view">
+    <div
+      class="dashboard-transform-btn"
+      @click="$router.push({ name: 'DashboardBoard', params: { id } })"
+    >
+      切换车间看板模式
+    </div>
     <Overview :id="id" ref="overview"></Overview>
     <DeviceErrorBar :id="id"></DeviceErrorBar>
     <Realtime :id="id" @status-change="handleDeviceStatusChange"></Realtime>
@@ -33,6 +39,21 @@ export default {
   padding-top: 62px;
   background: url('~@/assets/images/beijing@2x.png');
   background-size: cover;
+  position: relative;
+
+  .dashboard-transform-btn {
+    color: #efefef;
+    font-size: 12px;
+    position: absolute;
+    right: 20px;
+    top: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: rgb(54, 138, 255);
+    }
+  }
 
   .icon-flex {
     display: flex;
