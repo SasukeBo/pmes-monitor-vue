@@ -121,9 +121,9 @@
                 :key="'message' + i"
               >
                 <div class="device-number">
-                  <span class="item-dot"></span>{{ m.number }} {{m.time}}
+                  <span class="item-dot"></span>{{ m.number }} {{ m.time }}
                 </div>
-                <div class="messages">{{ m.messages.join('，') }}</div>
+                <div class="messages">{{ m.messages }}</div>
               </div>
             </div>
           </div>
@@ -233,7 +233,7 @@ export default {
       this.fetchSummary()
       this.summaryFresher = setInterval(() => {
         this.fetchSummary()
-      }, 5 * 60 * 1000) // 5分钟刷新
+      }, 60 * 1000) // 1分钟刷新
     },
     fetchSummary() {
       if (this.summaryLock) return
