@@ -207,6 +207,10 @@ export default {
       var t = new Date()
       this.time = t.toLocaleString()
     }, 1000)
+    this.startSummary()
+  },
+  beforeDestroy() {
+    clearInterval(this.summaryFresher)
   },
   methods: {
     handleMessage({ messages, number }) {
