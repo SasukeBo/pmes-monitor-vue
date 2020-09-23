@@ -43,11 +43,7 @@
             :device="d"
           ></HomeOverviewListCard>
         </div>
-        <div class="overview-list__footer">
-          <span style="cursor:pointer" @click="$router.push({ name: 'Device' })"
-            >查看更多</span
-          >
-        </div>
+        <div class="overview-list__footer"></div>
       </div>
     </div>
   </div>

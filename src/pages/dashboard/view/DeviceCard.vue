@@ -122,9 +122,7 @@
         <div>运行时长：{{ runningDuration }}</div>
       </div>
 
-      <div class="link">
-        查看更多 》
-      </div>
+      <div class="link"><br /></div>
     </div>
   </div>
 </template>

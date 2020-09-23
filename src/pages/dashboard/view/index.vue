@@ -42,7 +42,7 @@ export default {
   position: relative;
 
   .dashboard-transform-btn {
-    color: #efefef;
+    color: rgb(54, 138, 255);
     font-size: 12px;
     position: absolute;
     right: 20px;
@@ -51,7 +51,7 @@ export default {
     transition: all 0.3s ease;
 
     &:hover {
-      color: rgb(54, 138, 255);
+      color: #efefef;
     }
   }
 

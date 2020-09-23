@@ -26,16 +26,6 @@
           看板</a
         >
       </div>
-
-      <div
-        :class="['page-link__btn', $route.name === 'Device' ? 'active' : '']"
-        @click.prevent="$router.push({ name: 'Device' })"
-      >
-        <a href="/monitor/devices">
-          <img src="./images/pi-device@2x.png" class="icon" />
-          设备</a
-        >
-      </div>
     </div>
     <router-view></router-view>
   </div>
