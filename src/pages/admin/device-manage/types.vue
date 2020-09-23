@@ -16,9 +16,6 @@
         @click="dialogFormVisible = true"
         >新增机种</el-button
       >
-      <el-button size="small" type="danger" @click="deleteSelected"
-        >批量删除</el-button
-      >
     </div>
 
     <el-dialog title="创建机种" :visible.sync="dialogFormVisible" width="500px">
@@ -34,12 +31,19 @@
     </el-dialog>
 
     <div class="type-list">
-      <el-table class="admin-table" stripe :data="tableData.types">
-        <el-table-column type="selection"></el-table-column>
+      <el-table
+        class="admin-table"
+        stripe
+        :data="tableData.types"
+        v-loading="$apollo.queries.tableData.loading"
+      >
         <el-table-column type="index" label="序号"></el-table-column>
         <el-table-column prop="name" label="机种名称"></el-table-column>
-        <el-table-column prop="user" label="创建人"></el-table-column>
-        <el-table-column prop="createdAt" label="创建时间"></el-table-column>
+        <el-table-column
+          prop="createdAt"
+          label="创建时间"
+          :formatter="formatter"
+        ></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
@@ -148,6 +152,10 @@ export default {
           this.$GraphQLError(e)
         })
     },
+    formatter(row) {
+      var t = new Date(row.createdAt)
+      return t.toLocaleString()
+    },
     manageCode(id) {
       this.$router.push({ name: 'AdminDeviceTypeErrorCode', params: { id } })
     },
@@ -158,11 +166,20 @@ export default {
       this.page = val
     },
     deleteType(id) {
-      alert('未实现')
-      console.log(id)
-    },
-    deleteSelected() {
-      alert('未实现')
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation($id: Int!) {
+              response: adminDeviceTypeDelete(id: $id)
+            }
+          `,
+          client: 'adminClient',
+          variables: { id }
+        })
+        .then(() => {
+          this.$apollo.queries.tableData.refetch()
+        })
+        .catch((e) => this.$GraphQLError(e))
     }
   }
 }

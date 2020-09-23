@@ -31,7 +31,7 @@ export default {
           component: AdminDashboardCreate
         },
         {
-          path: ':id/editl',
+          path: ':id/edit',
           name: 'AdminDashboardEdit',
           props: true,
           component: AdminDashboardCreate

@@ -85,6 +85,38 @@ export default {
       selectedDevices: []
     }
   },
+  created() {
+    if (this.id) {
+      this.$apollo
+        .query({
+          query: gql`
+            query($id: Int!) {
+              response: adminDashboard(id: $id) {
+                id
+                name
+                devices {
+                  id
+                  number
+                  deviceType {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          `,
+          client: 'adminClient',
+          variables: { id: this.id }
+        })
+        .then(({ data: { response } }) => {
+          this.form.name = response.name
+          this.options = response.devices
+          this.selectedDevices = response.devices
+          this.form.deviceIDs = response.devices.map((d) => d.id)
+        })
+        .catch((e) => this.$GraphQLError(e))
+    }
+  },
   methods: {
     remoteMethod(val) {
       this.loading = true

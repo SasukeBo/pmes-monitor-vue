@@ -16,12 +16,15 @@
         @click="$router.push({ name: 'AdminDashboardCreate' })"
         >新增看板</el-button
       >
-      <el-button size="small" type="danger">批量删除</el-button>
     </div>
 
     <div class="type-list">
-      <el-table class="admin-table" stripe :data="tableData.dashboards">
-        <el-table-column type="selection"></el-table-column>
+      <el-table
+        class="admin-table"
+        stripe
+        :data="tableData.dashboards"
+        v-loading="$apollo.queries.tableData.loading"
+      >
         <el-table-column type="index" label="序号"></el-table-column>
         <el-table-column prop="name" label="看板名称"></el-table-column>
         <el-table-column label="设备数量">
@@ -29,8 +32,11 @@
             {{ (scope.row.devices || []).length }}
           </template>
         </el-table-column>
-        <el-table-column prop="user" label="创建人"></el-table-column>
-        <el-table-column prop="createdAt" label="创建时间"></el-table-column>
+        <el-table-column
+          prop="createdAt"
+          label="创建时间"
+          :formatter="formatter"
+        ></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
@@ -96,6 +102,7 @@ export default {
         }
       `,
       client: 'adminClient',
+      fetchPolicy: 'network-only',
       variables() {
         return {
           search: this.search,
@@ -110,13 +117,30 @@ export default {
       this.$router.push({ name: 'AdminDashboardEdit', params: { id } })
     },
     deleteDashboard(id) {
-      console.log(id)
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation($id: Int!) {
+              adminDashboardDelete(id: $id)
+            }
+          `,
+          client: 'adminClient',
+          variables: { id }
+        })
+        .then(() => {
+          this.$apollo.queries.tableData.refetch()
+        })
+        .catch((e) => this.$GraphQLError(e))
     },
     handleSizeChange(val) {
       this.limit = val
     },
     handleCurrentChange(val) {
       this.page = val
+    },
+    formatter(row) {
+      var t = new Date(row.createdAt)
+      return t.toLocaleString()
     }
   }
 }

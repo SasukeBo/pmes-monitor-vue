@@ -39,9 +39,6 @@
           </svg>
           <span>进入前台</span>
         </div>
-        <div class="header-btn">
-          admin
-        </div>
       </div>
       <div class="admin-main-body">
         <router-view></router-view>
